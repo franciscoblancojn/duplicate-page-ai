@@ -2,14 +2,28 @@
 
 use franciscoblancojn\wordpress_utils\FWUSystemLog;
 
-$post_id = $_POST['post_id'];
+$CONFIG = get_option(DPAI_CONFIG, []);
 
-if (isset($post_id) && isset($_POST['set_custom_field']) && $_POST['set_custom_field'] == "1") {
-    $customFields = $_POST['customFields'] ?? [];
-    if (!empty($customFields)) {
-        $result = DPAI_WP_JSON::setCustomFields($post_id, $customFields);
+if (isset($_POST['save']) && $_POST['save'] == "2") {
+    $post_id = $_POST['post_id'] ?? $CONFIG['post_id'];
+    if (isset($post_id)) {
+        $CONFIG['post_id'] = $post_id;
     }
+    if (isset($post_id) && isset($_POST['set_custom_field']) && $_POST['set_custom_field'] == "1") {
+        $customFields = $_POST['customFields'] ?? [];
+        if (!empty($customFields)) {
+            $result = DPAI_WP_JSON::setCustomFields($post_id, $customFields);
+        }
+    }
+    if (isset($post_id) && isset($_POST['generate_duplicate']) && $_POST['generate_duplicate'] == "1") {
+        $prompt = $_POST['prompt'] ?? [];
+        if (!empty($prompt)) {
+            $CONFIG['prompt'] = $prompt;
+        }
+    }
+    update_option(DPAI_CONFIG, $CONFIG);
 }
+$post_id = $CONFIG['post_id'];
 
 ?>
 <form method="post">
@@ -92,7 +106,7 @@ if (isset($post_id) && isset($_POST['set_custom_field']) && $_POST['set_custom_f
     </table>
 
     <div class="content-btn">
-        <?php submit_button('Ejecutar'); ?>
+        <?php submit_button('Cargar Post'); ?>
 
         <?php
         if (isset($post_id)) {
@@ -109,5 +123,29 @@ if (isset($post_id) && isset($_POST['set_custom_field']) && $_POST['set_custom_f
         }
         ?>
     </div>
+    <?php
+    if (isset($post_id)) {
+        $post = get_post_meta($post_id);
+    ?>
+        <h3>Prompt para generar Duplicados</h3>
+        <textarea
+            id="prompt"
+            name="prompt"
+            placeholder="Generar paginas duplicadas basandose en ...."
+            class="large-text code"
+            style="min-height: 300px;"
+            rows="8"><?= $CONFIG['prompt']?></textarea>
+
+        <button
+            type="submit"
+            name="generate_duplicate"
+            value="1"
+            class="button">
+            Generar Duplicados
+        </button>
+    <?php
+    }
+    ?>
+
 </form>
 <?php

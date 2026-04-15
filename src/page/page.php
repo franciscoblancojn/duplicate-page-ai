@@ -2,11 +2,11 @@
 $TAGS = [
     [
         'key' => 'config',
-        'title' => 'Configuracion',
+        'title' => 'Configuracion AI',
     ],
     [
-        'key' => 'test',
-        'title' => 'Pruebas',
+        'key' => 'duplication',
+        'title' => 'Duplicacion de Paginas',
     ],
 ];
 
