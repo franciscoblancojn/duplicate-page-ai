@@ -2,9 +2,12 @@
 
 use franciscoblancojn\wordpress_utils\FWUSystemLog;
 
-$CONFIG = get_option(DPAI_CONFIG, []);
-
-if (isset($_POST['save']) && $_POST['save'] == "2") {
+$post_id = $CONFIG['post_id'];
+$customFields = [];
+if (isset($post_id)) {
+    $customFields = DPAI_WP_JSON::getCustomFields($post_id);
+}
+if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     $post_id = $_POST['post_id'] ?? $CONFIG['post_id'];
     if (isset($post_id)) {
         $CONFIG['post_id'] = $post_id;
@@ -12,22 +15,27 @@ if (isset($_POST['save']) && $_POST['save'] == "2") {
     if (isset($post_id) && isset($_POST['set_custom_field']) && $_POST['set_custom_field'] == "1") {
         $customFields = $_POST['customFields'] ?? [];
         if (!empty($customFields)) {
-            $result = DPAI_WP_JSON::setCustomFields($post_id, $customFields);
+            DPAI_WP_JSON::setCustomFields($post_id, $customFields);
         }
     }
     if (isset($post_id) && isset($_POST['generate_duplicate']) && $_POST['generate_duplicate'] == "1") {
-        $prompt = $_POST['prompt'] ?? [];
-        if (!empty($prompt)) {
+        $prompt = $_POST['prompt'];
+        if (isset($prompt)) {
             $CONFIG['prompt'] = $prompt;
+            $duplicados = DPAI_AI::generatePrompt($post_id,$prompt,$customFields);
+            var_dump($duplicados);
         }
     }
+    FWUSystemLog::add(DPAI_KEY, [
+        'type' => "save_duplication",
+        'data' => $_POST
+    ]);
     update_option(DPAI_CONFIG, $CONFIG);
 }
-$post_id = $CONFIG['post_id'];
 
 ?>
 <form method="post">
-    <input type="hidden" name="save" value="2">
+    <input type="hidden" name="save" value="duplication">
     <table class="form-table">
         <tr>
             <th scope="row">
@@ -71,9 +79,6 @@ $post_id = $CONFIG['post_id'];
             </tr>
             <tr>
                 <td colspan="2">
-                    <?php
-                    $customFields = DPAI_WP_JSON::getCustomFields($post_id);
-                    ?>
                     <table class="form-table">
                         <?php
                         foreach ($customFields as $key => $value) {
@@ -133,8 +138,8 @@ $post_id = $CONFIG['post_id'];
             name="prompt"
             placeholder="Generar paginas duplicadas basandose en ...."
             class="large-text code"
-            style="min-height: 300px;"
-            rows="8"><?= $CONFIG['prompt']?></textarea>
+            style="min-height: 200px;"
+            rows="8"><?= $CONFIG['prompt'] ?></textarea>
 
         <button
             type="submit"

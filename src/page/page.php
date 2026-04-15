@@ -1,8 +1,17 @@
 <?php
+
+function tooltip($text)
+{
+    return '
+    <span class="goshap-tooltip">
+        <span class="dashicons dashicons-info"></span>
+        <span class="goshap-tooltip-text">' . $text . '</span>
+    </span>';
+}
 $TAGS = [
     [
         'key' => 'config',
-        'title' => 'Configuracion AI',
+        'title' => 'Configuracion IA',
     ],
     [
         'key' => 'duplication',
@@ -11,6 +20,8 @@ $TAGS = [
 ];
 
 $defaultTag =  $TAGS[0]['key'];
+
+$CONFIG = get_option(DPAI_CONFIG, []);
 ?>
 <div class="wrap">
     <h1>Duplicate Page AI</h1>
