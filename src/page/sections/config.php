@@ -18,7 +18,7 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
 }
 
 if (isset($CONFIG['apikey'])) {
-    $respond = DPAI_AI::getModels();
+    $respond_config = DPAI_AI::getModels();
 }
 
 ?>
@@ -43,9 +43,9 @@ if (isset($CONFIG['apikey'])) {
             </td>
         </tr>
         <?php
-        if (isset($respond) && $respond['status'] === 'ok') {
+        if (isset($respond_config) && $respond_config['status'] === 'ok') {
 
-            $modelos = $respond['data'] ?? [];
+            $modelos = $respond_config['data'] ?? [];
 
             // Modelo actual o el primero de la lista
             $modeloActual = $CONFIG['modelo'] ?? ($modelos[0]['model'] ?? null);
@@ -79,11 +79,11 @@ if (isset($CONFIG['apikey'])) {
         <?php submit_button('Guardar'); ?>
     </div>
     <?php
-    if (isset($respond)) {
-        if ($respond['status'] == 'error') {
+    if (isset($respond_config)) {
+        if ($respond_config['status'] == 'error') {
     ?>
             <p class="error">
-                <?= parseError($respond['message']); ?>
+                <?= parseError($respond_config['message']); ?>
             </p>
     <?php
         }

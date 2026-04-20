@@ -9,58 +9,24 @@ class DPAI_AI
         $DPAI_CONFIG = new DPAI_CONFIG();
         return $DPAI_CONFIG->getConfig();
     }
-    public static function generatePrompt($post_id, $prompt, $customFields)
-    {
-        $title = get_the_title($post_id);
-        $content = get_post_field('post_content', $post_id);
-        $PROMPT = "
-            ----TITULO DE LA PAGINA----
-            " . $title . "
-            ----CONTENIDO DE LA PAGINA----
-            " . $content . "
-            ----CAMPOS PERSONALIZADOS----
-            " . json_encode($customFields) . "
-            ----PROMP BASE----
-            " . $prompt . "
-            ----
-            Necesito que generes un json basandote en el contenido y cambos personalizados como referencia.
-            Formato de json : {title:'title',customFields:{key:'value',...}}
-            En caso que se pidan varias respuesta este es el formato a usar:
-            Formato de array : [{title:'title',customFields:{key:'value',...}},{title:'title2',customFields:{key:'value',...}}]
-            Importante, ten en cuenta el prompt base.
-        ";
-        return $PROMPT;
-    }
-    public static function generateDuplicatos($post_id, $prompt, $customFields)
-    {
+    private static function request(
+        $url,
+        $method = "GET",
+        $data = null,
+    ) {
         $jsonResponse = [];
         try {
-            $CONFIG = self::getConfig();
-            $PROMPT = self::generatePrompt($post_id, $prompt, $customFields);
-            // 1. Configuración de parámetros
-            $apiKey = $CONFIG['apikey']; // Reemplaza con tu clave real
-            $modelo = $CONFIG['modelo'];
-            $url = "https://generativelanguage.googleapis.com/v1/models/{$modelo}:generateContent?key={$apiKey}";
-
-            // 2. Estructura del cuerpo de la petición (JSON)
-            $data = [
-                "contents" => [
-                    [
-                        "parts" => [
-                            ["text" => $PROMPT]
-                        ]
-                    ]
-                ]
-            ];
-
-            // 3. Configuración de cURL
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
+            if ($method == "POST") {
+                curl_setopt($ch, CURLOPT_POST, true);
+            }
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Content-Type: application/json'
             ]);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            if (isset($data)) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            }
 
             // 4. Ejecución y manejo de errores
             $response = curl_exec($ch);
@@ -77,8 +43,55 @@ class DPAI_AI
             if (isset($jsonResponse['error'])) {
                 throw new \RuntimeException('Error: ' . $jsonResponse['error']['message']);
             }
+            return [
+                "status" => "ok",
+                "message" => "Respuesta Exitosa",
+                'data' => $jsonResponse
+            ];;
+        } catch (\Throwable $th) {
+            $error = [
+                "status" => "error",
+                "message" => $th->getMessage(),
+                'data' => [
+                    'line' => $th->getLine(),
+                    'file' => $th->getFile(),
+                    'jsonResponse' => $jsonResponse
+                ]
+            ];
+            FWUSystemLog::add(DPAI_KEY, [
+                'type' => "IA error",
+                'data' => $error
+            ]);
+            return $error;
+        }
+    }
+    public static function sendPrompt($PROMPT)
+    {
+        $jsonResponse = [];
+        try {
+            $CONFIG = self::getConfig();
+            // 1. Configuración de parámetros
+            $apiKey = $CONFIG['apikey']; // Reemplaza con tu clave real
+            $modelo = $CONFIG['modelo'];
+            $url = "https://generativelanguage.googleapis.com/v1/models/{$modelo}:generateContent?key={$apiKey}";
 
-            // 6. Extraer el texto de la respuesta siguiendo la estructura de la API
+            // 2. Estructura del cuerpo de la petición (JSON)
+            $data = [
+                "contents" => [
+                    [
+                        "parts" => [
+                            ["text" => $PROMPT]
+                        ]
+                    ]
+                ]
+            ];
+
+            $result = self::request($url,"POST", $data);
+            if ($result['status'] == 'error') {
+                return $result;
+            }
+            $jsonResponse = $result['data'];
+            // 3. Extraer el texto de la respuesta siguiendo la estructura de la API
             if (isset($jsonResponse['candidates'][0]['content']['parts'][0]['text'])) {
                 $result = $jsonResponse['candidates'][0]['content']['parts'][0]['text'];
                 $data = json_decode($result, true);
@@ -89,7 +102,7 @@ class DPAI_AI
                     'data' => $data,
                 ];
             } else {
-                throw new \RuntimeException('Error en cURL: ' . curl_error($ch));
+                throw new \RuntimeException('Error en cURL');
             }
         } catch (\Throwable $th) {
             $error = [
@@ -120,24 +133,11 @@ class DPAI_AI
             // Endpoint para listar modelos
             $url = "https://generativelanguage.googleapis.com/v1/models?key={$apiKey}";
 
-            // cURL
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPGET, true);
-
-            $response = curl_exec($ch);
-
-            if (curl_errno($ch)) {
-                throw new \RuntimeException('Error en cURL: ' . curl_error($ch));
+            $result = self::request($url);
+            if ($result['status'] == 'error') {
+                return $result;
             }
-
-            curl_close($ch);
-
-            $jsonResponse = json_decode($response, true);
-
-            if (isset($jsonResponse['error'])) {
-                throw new \RuntimeException('Error: ' . $jsonResponse['error']['message']);
-            }
+            $jsonResponse = $result['data'];
 
             $models = [];
 
