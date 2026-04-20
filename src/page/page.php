@@ -56,13 +56,21 @@ $CONFIG = $DPAI_CONFIG->getConfig();
         .tab-content:not(.nav-tab-active) {
             display: none;
         }
-
         .tab-content {
             padding-top: 1rem;
         }
-
         .nav-tab {
             cursor: pointer;
+        }
+        .error{
+            color: #ffffffff;
+            background: #d63638;
+            font-weight: 900;
+            position: sticky;
+            left: 0;
+            bottom: .5rem;
+            padding: 1rem;
+            border-radius: .5rem;
         }
     </style>
     <script>

@@ -74,6 +74,10 @@ class DPAI_AI
             // 5. Decodificar la respuesta
             $jsonResponse = json_decode($response, true);
 
+            if (isset($jsonResponse['error'])) {
+                throw new \RuntimeException('Error: ' . $jsonResponse['error']['message']);
+            }
+
             // 6. Extraer el texto de la respuesta siguiendo la estructura de la API
             if (isset($jsonResponse['candidates'][0]['content']['parts'][0]['text'])) {
                 $result = $jsonResponse['candidates'][0]['content']['parts'][0]['text'];
@@ -88,7 +92,7 @@ class DPAI_AI
                 throw new \RuntimeException('Error en cURL: ' . curl_error($ch));
             }
         } catch (\Throwable $th) {
-            return [
+            $error = [
                 "status" => "error",
                 "message" => $th->getMessage(),
                 'data' => [
@@ -97,6 +101,11 @@ class DPAI_AI
                     'jsonResponse' => $jsonResponse
                 ]
             ];
+            FWUSystemLog::add(DPAI_KEY, [
+                'type' => "IA error",
+                'data' => $error
+            ]);
+            return $error;
         }
     }
 }
