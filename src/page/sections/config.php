@@ -11,7 +11,7 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
         'type' => "save_config",
         'data' => $_POST
     ]);
-    update_option(DPAI_CONFIG, $CONFIG);
+    $DPAI_CONFIG->setConfig($CONFIG);
 }
 ?>
 <form method="post">

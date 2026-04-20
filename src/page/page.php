@@ -19,9 +19,11 @@ $TAGS = [
     ],
 ];
 
+$DPAI_CONFIG = new DPAI_CONFIG();
+
 $defaultTag =  $TAGS[0]['key'];
 
-$CONFIG = get_option(DPAI_CONFIG, []);
+$CONFIG = $DPAI_CONFIG->getConfig();
 ?>
 <div class="wrap">
     <h1>Duplicate Page AI</h1>

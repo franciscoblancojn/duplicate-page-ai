@@ -22,7 +22,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         $prompt = $_POST['prompt'];
         if (isset($prompt)) {
             $CONFIG['prompt'] = $prompt;
-            $duplicados = DPAI_AI::generatePrompt($post_id,$prompt,$customFields);
+            $duplicados = DPAI_AI::generateDuplicatos($post_id, $prompt, $customFields);
             var_dump($duplicados);
         }
     }
@@ -30,7 +30,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         'type' => "save_duplication",
         'data' => $_POST
     ]);
-    update_option(DPAI_CONFIG, $CONFIG);
+    $DPAI_CONFIG->setConfig($CONFIG);
 }
 
 ?>

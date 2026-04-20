@@ -4,7 +4,11 @@ use franciscoblancojn\wordpress_utils\FWUSystemLog;
 
 class DPAI_AI
 {
-    public static function init() {}
+    private static function getConfig()
+    {
+        $DPAI_CONFIG = new DPAI_CONFIG();
+        return $DPAI_CONFIG->getConfig();
+    }
     public static function generatePrompt($post_id, $prompt, $customFields)
     {
         $title = get_the_title($post_id);
@@ -30,9 +34,10 @@ class DPAI_AI
     public static function generateDuplicatos($post_id, $prompt, $customFields)
     {
         try {
+            $CONFIG = self::getConfig();
             $PROMPT = self::generatePrompt($post_id, $prompt, $customFields);
             // 1. Configuración de parámetros
-            $apiKey = 'TU_API_KEY_AQUI'; // Reemplaza con tu clave real
+            $apiKey = $CONFIG['apikey']; // Reemplaza con tu clave real
             $modelo = 'gemini-1.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelo}:generateContent?key={$apiKey}";
 
@@ -71,7 +76,7 @@ class DPAI_AI
             // 6. Extraer el texto de la respuesta siguiendo la estructura de la API
             if (isset($jsonResponse['candidates'][0]['content']['parts'][0]['text'])) {
                 $result = $jsonResponse['candidates'][0]['content']['parts'][0]['text'];
-                $data = json_decode($result,true);
+                $data = json_decode($result, true);
                 return [
                     "status" => "ok",
                     "message" => "Respuesta Exitosa",
