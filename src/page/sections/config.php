@@ -7,6 +7,9 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
     if (isset($_POST['apikey'])) {
         $CONFIG['apikey'] = $_POST['apikey'];
     }
+    if (isset($_POST['modelo'])) {
+        $CONFIG['modelo'] = $_POST['modelo'];
+    }
     FWUSystemLog::add(DPAI_KEY, [
         'type' => "save_config",
         'data' => $_POST
@@ -31,6 +34,23 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
                     name="apikey"
                     placeholder="API KEY"
                     value="<?= $CONFIG['apikey'] ?>"
+                    class="regular-text" />
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="apikey">
+                    Modelo
+                    <?= tooltip('Modelo de IA que se usa.') ?>
+                </label>
+            </th>
+            <td>
+                <input
+                    type="text"
+                    id="modelo"
+                    name="modelo"
+                    placeholder="Modelo"
+                    value="<?= $CONFIG['modelo'] ?? DPAI_CONFIG_MODEL_DEFAULT?>"
                     class="regular-text" />
             </td>
         </tr>

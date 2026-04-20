@@ -33,12 +33,13 @@ class DPAI_AI
     }
     public static function generateDuplicatos($post_id, $prompt, $customFields)
     {
+        $jsonResponse = [];
         try {
             $CONFIG = self::getConfig();
             $PROMPT = self::generatePrompt($post_id, $prompt, $customFields);
             // 1. Configuración de parámetros
             $apiKey = $CONFIG['apikey']; // Reemplaza con tu clave real
-            $modelo = 'gemini-1.5-flash';
+            $modelo = $CONFIG['modelo'] ?? DPAI_CONFIG_MODEL_DEFAULT;
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelo}:generateContent?key={$apiKey}";
 
             // 2. Estructura del cuerpo de la petición (JSON)
@@ -65,7 +66,7 @@ class DPAI_AI
             $response = curl_exec($ch);
 
             if (curl_errno($ch)) {
-                throw new Throwable('Error en cURL: ' . curl_error($ch));
+                throw new \RuntimeException('Error en cURL: ' . curl_error($ch));
             }
 
             curl_close($ch);
@@ -84,7 +85,7 @@ class DPAI_AI
                     'data' => $data,
                 ];
             } else {
-                throw new Throwable("Error en la respuesta: " . print_r($jsonResponse, true));
+                throw new \RuntimeException('Error en cURL: ' . curl_error($ch));
             }
         } catch (\Throwable $th) {
             return [
@@ -92,7 +93,8 @@ class DPAI_AI
                 "message" => $th->getMessage(),
                 'data' => [
                     'line' => $th->getLine(),
-                    'file' => $th->getFile()
+                    'file' => $th->getFile(),
+                    'jsonResponse' => $jsonResponse
                 ]
             ];
         }

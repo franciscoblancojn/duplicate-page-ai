@@ -19,6 +19,7 @@ require_once __DIR__ . '/libs/autoload.php';
 //DPAI_
 define("DPAI_KEY",'DPAI');
 define("DPAI_CONFIG",'DPAI_CONFIG');
+define("DPAI_CONFIG_MODEL_DEFAULT",'gemini-2.0-flash');
 define("DPAI_LOG",true);
 define("DPAI_LOG_KEY","DPAI_LOG");
 define("DPAI_LOG_COUNT",100);
