@@ -11,21 +11,26 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: wc-duplicate-page-ai
 */
 
-if (!function_exists( 'is_plugin_active' ))
-    require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+if (!function_exists('is_plugin_active'))
+    require_once(ABSPATH . '/wp-admin/includes/plugin.php');
 
 require_once __DIR__ . '/libs/autoload.php';
 
 //DPAI_
-define("DPAI_KEY",'DPAI');
-define("DPAI_CONFIG",'DPAI_CONFIG');
-define("DPAI_CONFIG_MODEL_DEFAULT",'gemini-2.0-flash');
-define("DPAI_LOG",true);
-define("DPAI_LOG_KEY","DPAI_LOG");
-define("DPAI_LOG_COUNT",100);
-define("DPAI_BASENAME",plugin_basename(__FILE__));
-define("DPAI_DIR",plugin_dir_path( __FILE__ ));
-define("DPAI_URL",plugin_dir_url(__FILE__));
+define("DPAI_KEY", 'DPAI');
+define("DPAI_CONFIG", 'DPAI_CONFIG');
+define("DPAI_CONFIG_MODEL_DEFAULT", 'gemini-2.0-flash');
+define("DPAI_CONFIG_LIST_MODELS", [
+    // 'gemini-1.5-flash-latest' => 'Gemini 1.5 Flash',
+    // 'gemini-1.5-pro-latest' => 'Gemini 1.5 Pro',
+    'gemini-2.0-flash' => 'Gemini 2.0 Flash',
+]);
+define("DPAI_LOG", true);
+define("DPAI_LOG_KEY", "DPAI_LOG");
+define("DPAI_LOG_COUNT", 100);
+define("DPAI_BASENAME", plugin_basename(__FILE__));
+define("DPAI_DIR", plugin_dir_path(__FILE__));
+define("DPAI_URL", plugin_dir_url(__FILE__));
 
 //importar libreria
 // add_system_log("DPAI")
@@ -33,12 +38,12 @@ define("DPAI_URL",plugin_dir_url(__FILE__));
 
 require_once DPAI_DIR . 'update.php';
 github_updater_plugin_wordpress([
-    'basename'=>DPAI_BASENAME,
-    'dir'=>DPAI_DIR,
-    'file'=>"index.php",
-    'path_repository'=>'franciscoblancojn/duplicate-page-ai',
-    'branch'=>'master',
-    'token_array_split'=>[
+    'basename' => DPAI_BASENAME,
+    'dir' => DPAI_DIR,
+    'file' => "index.php",
+    'path_repository' => 'franciscoblancojn/duplicate-page-ai',
+    'branch' => 'master',
+    'token_array_split' => [
         "g",
         "h",
         "p",
@@ -83,6 +88,7 @@ github_updater_plugin_wordpress([
 ]);
 
 use franciscoblancojn\wordpress_utils\FWUSystemLog;
+
 if (is_admin()) {
     FWUSystemLog::init(DPAI_KEY);
 }

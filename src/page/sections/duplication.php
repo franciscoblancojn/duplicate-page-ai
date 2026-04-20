@@ -152,7 +152,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
             if ($duplicados['status'] == 'error') {
         ?>
                 <p class="error">
-                    <?= $duplicados['message']; ?>
+                    <?= parseError($duplicados['message']); ?>
                 </p>
         <?php
             }

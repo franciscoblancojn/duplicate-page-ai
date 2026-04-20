@@ -45,13 +45,15 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
                 </label>
             </th>
             <td>
-                <input
-                    type="text"
-                    id="modelo"
-                    name="modelo"
-                    placeholder="Modelo"
-                    value="<?= $CONFIG['modelo'] ?? DPAI_CONFIG_MODEL_DEFAULT?>"
-                    class="regular-text" />
+                <select id="modelo" name="modelo" class="regular-text">
+                    <?php 
+                        $modeloActual = $CONFIG['modelo'] ?? DPAI_CONFIG_MODEL_DEFAULT;
+                        foreach (DPAI_CONFIG_LIST_MODELS as $value => $label): ?>
+                        <option value="<?= $value ?>" <?= $modeloActual === $value ? 'selected' : '' ?>>
+                            <?= $label ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </td>
         </tr>
     </table>
