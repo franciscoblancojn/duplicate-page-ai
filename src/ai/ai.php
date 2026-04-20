@@ -39,8 +39,8 @@ class DPAI_AI
             $PROMPT = self::generatePrompt($post_id, $prompt, $customFields);
             // 1. Configuración de parámetros
             $apiKey = $CONFIG['apikey']; // Reemplaza con tu clave real
-            $modelo = $CONFIG['modelo'] ?? DPAI_CONFIG_MODEL_DEFAULT;
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelo}:generateContent?key={$apiKey}";
+            $modelo = $CONFIG['modelo'];
+            $url = "https://generativelanguage.googleapis.com/v1/models/{$modelo}:generateContent?key={$apiKey}";
 
             // 2. Estructura del cuerpo de la petición (JSON)
             $data = [
@@ -105,6 +105,81 @@ class DPAI_AI
                 'type' => "IA error",
                 'data' => $error
             ]);
+            return $error;
+        }
+    }
+    public static function getModels()
+    {
+        $jsonResponse = [];
+
+        try {
+            $CONFIG = self::getConfig();
+
+            $apiKey = $CONFIG['apikey'];
+
+            // Endpoint para listar modelos
+            $url = "https://generativelanguage.googleapis.com/v1/models?key={$apiKey}";
+
+            // cURL
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPGET, true);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                throw new \RuntimeException('Error en cURL: ' . curl_error($ch));
+            }
+
+            curl_close($ch);
+
+            $jsonResponse = json_decode($response, true);
+
+            if (isset($jsonResponse['error'])) {
+                throw new \RuntimeException('Error: ' . $jsonResponse['error']['message']);
+            }
+
+            $models = [];
+
+            if (!empty($jsonResponse['models']) && is_array($jsonResponse['models'])) {
+                foreach ($jsonResponse['models'] as $model) {
+
+                    $methods = $model['supportedGenerationMethods'] ?? [];
+
+                    // Filtrar solo los que soportan generateContent
+                    if (!in_array('generateContent', $methods)) {
+                        continue;
+                    }
+
+                    $models[] = [
+                        'name' => $model['name'],
+                        'model' => str_replace('models/', '', $model['name']),
+                        'displayName' => $model['displayName'] ?? $model['name'],
+                    ];
+                }
+            }
+
+            return [
+                "status" => "ok",
+                "message" => "Modelos obtenidos correctamente",
+                "data" => $models,
+            ];
+        } catch (\Throwable $th) {
+            $error = [
+                "status" => "error",
+                "message" => $th->getMessage(),
+                'data' => [
+                    'line' => $th->getLine(),
+                    'file' => $th->getFile(),
+                    'jsonResponse' => $jsonResponse
+                ]
+            ];
+
+            FWUSystemLog::add(DPAI_KEY, [
+                'type' => "IA modelos error",
+                'data' => $error
+            ]);
+
             return $error;
         }
     }

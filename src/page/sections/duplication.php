@@ -22,7 +22,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         $prompt = $_POST['prompt'];
         if (isset($prompt)) {
             $CONFIG['prompt'] = $prompt;
-            $duplicados = DPAI_AI::generateDuplicatos($post_id, $prompt, $customFields);
+            $respond = DPAI_AI::generateDuplicatos($post_id, $prompt, $customFields);
         }
     }
     FWUSystemLog::add(DPAI_KEY, [
@@ -148,11 +148,17 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
             Generar Duplicados
         </button>
         <?php
-        if (isset($duplicados)) {
-            if ($duplicados['status'] == 'error') {
+        if (isset($respond)) {
+            if ($respond['status'] == 'error') {
         ?>
                 <p class="error">
-                    <?= parseError($duplicados['message']); ?>
+                    <?= parseError($respond['message']); ?>
+                </p>
+        <?php
+            }else{
+        ?>
+                <p >
+                    <?= json_encode($respond); ?>
                 </p>
         <?php
             }

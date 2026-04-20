@@ -16,6 +16,11 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
     ]);
     $DPAI_CONFIG->setConfig($CONFIG);
 }
+
+if (isset($CONFIG['apikey'])) {
+    $respond = DPAI_AI::getModels();
+}
+
 ?>
 <form method="post">
     <input type="hidden" name="save" value="config">
@@ -37,30 +42,53 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
                     class="regular-text" />
             </td>
         </tr>
-        <tr>
-            <th scope="row">
-                <label for="apikey">
-                    Modelo
-                    <?= tooltip('Modelo de IA que se usa.') ?>
-                </label>
-            </th>
-            <td>
-                <select id="modelo" name="modelo" class="regular-text">
-                    <?php 
-                        $modeloActual = $CONFIG['modelo'] ?? DPAI_CONFIG_MODEL_DEFAULT;
-                        foreach (DPAI_CONFIG_LIST_MODELS as $value => $label): ?>
-                        <option value="<?= $value ?>" <?= $modeloActual === $value ? 'selected' : '' ?>>
-                            <?= $label ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </td>
-        </tr>
+        <?php
+        if (isset($respond) && $respond['status'] === 'ok') {
+
+            $modelos = $respond['data'] ?? [];
+
+            // Modelo actual o el primero de la lista
+            $modeloActual = $CONFIG['modelo'] ?? ($modelos[0]['model'] ?? null);
+        ?>
+            <tr>
+                <th scope="row">
+                    <label for="modelo">
+                        Modelo
+                        <?= tooltip('Modelo de IA que se usa.') ?>
+                    </label>
+                </th>
+                <td>
+                    <select id="modelo" name="modelo" class="regular-text">
+                        <?php foreach ($modelos as $model):
+                            $value = $model['model'];
+                            $label = $model['displayName'];
+                        ?>
+                            <option value="<?= esc_attr($value) ?>" <?= $modeloActual === $value ? 'selected' : '' ?>>
+                                <?= esc_html($label) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </td>
+            </tr>
+        <?php
+        }
+        ?>
     </table>
 
     <div class="content-btn">
         <?php submit_button('Guardar'); ?>
     </div>
+    <?php
+    if (isset($respond)) {
+        if ($respond['status'] == 'error') {
+    ?>
+            <p class="error">
+                <?= parseError($respond['message']); ?>
+            </p>
+    <?php
+        }
+    }
+    ?>
 </form>
 <style>
     .content-btn {
