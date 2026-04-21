@@ -35,6 +35,9 @@ class DPAI_DUPLICADOS
             if ($result['status'] == 'error') {
                 return $result;
             }
+            
+            $result['data'] = DPAI_AI::parseJson($result['data']);
+
             return $result;
         } catch (\Throwable $th) {
             $error = [
@@ -55,7 +58,7 @@ class DPAI_DUPLICADOS
         $jsonResponse = [];
         try {
             $PROMPT = self::getPrompt($post_id, $prompt, $customFields);
-            $result = DPAI_AI::sendPrompt($PROMPT);
+            $result = self::getDuplicadosByPrompt($PROMPT);
             return $result;
         } catch (\Throwable $th) {
             $error = [

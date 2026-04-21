@@ -86,19 +86,17 @@ class DPAI_AI
                 ]
             ];
 
-            $result = self::request($url,"POST", $data);
+            $result = self::request($url, "POST", $data);
             if ($result['status'] == 'error') {
                 return $result;
             }
             $jsonResponse = $result['data'];
             // 3. Extraer el texto de la respuesta siguiendo la estructura de la API
             if (isset($jsonResponse['candidates'][0]['content']['parts'][0]['text'])) {
-                $result = $jsonResponse['candidates'][0]['content']['parts'][0]['text'];
-                $data = json_decode($result, true);
+                $data = $jsonResponse['candidates'][0]['content']['parts'][0]['text'];
                 return [
                     "status" => "ok",
                     "message" => "Respuesta Exitosa",
-                    'result' => $result,
                     'data' => $data,
                 ];
             } else {
@@ -182,5 +180,42 @@ class DPAI_AI
 
             return $error;
         }
+    }
+    public static function parseJson($dataString)
+    {
+        if (!$dataString) {
+            throw new \RuntimeException('Respuesta vacía');
+        }
+
+        // 1. Quitar bloques ```json ... ```
+        $dataString = preg_replace('/^```json\s*/i', '', $dataString);
+        $dataString = preg_replace('/^```/i', '', $dataString);
+        $dataString = preg_replace('/```$/', '', $dataString);
+
+        // 2. Trim
+        $dataString = trim($dataString);
+
+        // 3. Intento directo
+        $data = json_decode($dataString, true);
+
+        // 4. Si falla, intentar limpiar más agresivo (muy común en IA)
+        if (json_last_error() !== JSON_ERROR_NONE) {
+
+            // Extraer solo el JSON válido (array o objeto)
+            if (preg_match('/(\{.*\}|\[.*\])/s', $dataString, $matches)) {
+                $dataString = $matches[0];
+                $data = json_decode($dataString, true);
+            }
+        }
+
+        // 5. Validación final
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException(
+                'Error al parsear JSON: ' . json_last_error_msg() .
+                    ' | String recibido: ' . substr($dataString, 0, 500)
+            );
+        }
+
+        return $data;
     }
 }
