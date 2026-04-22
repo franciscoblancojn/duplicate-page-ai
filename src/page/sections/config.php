@@ -14,7 +14,7 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
         'type' => "save_config",
         'data' => $_POST
     ]);
-    $DPAI_CONFIG->setConfig($CONFIG);
+    $DPAI_CONFIG->set($CONFIG);
 }
 
 if (isset($CONFIG['apikey'])) {
@@ -80,13 +80,11 @@ if (isset($CONFIG['apikey'])) {
     </div>
     <?php
     if (isset($respond_config)) {
-        if ($respond_config['status'] == 'error') {
     ?>
-            <p class="error">
-                <?= parseError($respond_config['message']); ?>
-            </p>
+        <p class="message <?= $respond_config['status'] ?>">
+            <?= parseRespondMessage($respond_config['message']); ?>
+        </p>
     <?php
-        }
     }
     ?>
 </form>

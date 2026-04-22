@@ -8,7 +8,7 @@ function tooltip($text)
         <span class="goshap-tooltip-text">' . $text . '</span>
     </span>';
 }
-function parseError($text)
+function parseRespondMessage($text)
 {
     return preg_replace(
         '/(https?:\/\/[^\s]+)/',
@@ -31,7 +31,7 @@ $DPAI_CONFIG = new DPAI_CONFIG();
 
 $defaultTag =  $TAGS[0]['key'];
 
-$CONFIG = $DPAI_CONFIG->getConfig();
+$CONFIG = $DPAI_CONFIG->get();
 ?>
 <div class="wrap">
     <h1>Duplicate Page AI</h1>
@@ -64,21 +64,30 @@ $CONFIG = $DPAI_CONFIG->getConfig();
         .tab-content:not(.nav-tab-active) {
             display: none;
         }
+
         .tab-content {
             padding-top: 1rem;
         }
+
         .nav-tab {
             cursor: pointer;
         }
-        .error{
-            color: #ffffffff;
-            background: #d63638;
+
+        .message {
             font-weight: 900;
             position: sticky;
             left: 0;
             bottom: .5rem;
             padding: 1rem;
             border-radius: .5rem;
+        }
+        .error {
+            color: #ffffffff;
+            background: #d63638;
+        }
+        .ok {
+            color: #ffffffff;
+            background: #25992fff;
         }
     </style>
     <script>

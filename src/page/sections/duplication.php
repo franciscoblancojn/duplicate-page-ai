@@ -29,7 +29,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         'type' => "save_duplication",
         'data' => $_POST
     ]);
-    $DPAI_CONFIG->setConfig($CONFIG);
+    $DPAI_CONFIG->set($CONFIG);
 }
 
 ?>
@@ -149,19 +149,11 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         </button>
         <?php
         if (isset($respond_duplicados)) {
-            if ($respond_duplicados['status'] == 'error') {
         ?>
-                <p class="error">
-                    <?= parseError($respond_duplicados['message']); ?>
+                <p class="message <?= $respond_duplicados['status'] ?>">
+                    <?= parseRespondMessage($respond_duplicados['message']); ?>
                 </p>
         <?php
-            }else{
-        ?>
-                <p >
-                    <?= json_encode($respond_duplicados); ?>
-                </p>
-        <?php
-            }
         }
         ?>
     <?php

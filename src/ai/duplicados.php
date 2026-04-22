@@ -35,7 +35,7 @@ class DPAI_DUPLICADOS
             if ($result['status'] == 'error') {
                 return $result;
             }
-            
+            $result['message'] = "Duplicados Generado";
             $result['data'] = DPAI_AI::parseJson($result['data']);
 
             return $result;
