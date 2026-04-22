@@ -27,13 +27,13 @@ $TAGS = [
     ],
 ];
 
-$DPAI_CONFIG = new DPAI_CONFIG();
+$DPAI_USE_DATA_CONFIG = new DPAI_USE_DATA_CONFIG();
 
 $defaultTag =  $TAGS[0]['key'];
 
-$CONFIG = $DPAI_CONFIG->get();
+$CONFIG = $DPAI_USE_DATA_CONFIG->get();
 ?>
-<div class="wrap">
+<div id="page-<?=DPAI_KEY?>" class="wrap">
     <h1>Duplicate Page AI</h1>
     <div class="nav-tab-wrapper woo-nav-tab-wrapper">
         <?php
@@ -89,6 +89,33 @@ $CONFIG = $DPAI_CONFIG->get();
             color: #ffffffff;
             background: #25992fff;
         }
+        [type="submit"].loader{
+            position: relative;
+            color: transparent !important;
+        }
+        [type="submit"].loader::after{
+            content: '';
+            display: block;
+            position: absolute;
+            inset:0;
+            margin: auto;
+            width: 1rem;
+            height: 1rem;
+            aspect-ratio: 1/1;
+            border-radius: 100%;
+            border: 2px solid #1d2327;
+            border-top-color: transparent;
+            animation: rotate 1s infinite ;
+        }
+        [type="submit"].button-primary.loader::after{
+            border: 2px solid #fff;
+            border-top-color: transparent;
+        }
+        @keyframes rotate {
+            to{
+                transform: rotateZ(360deg);
+            }
+        }
     </style>
     <script>
         document.querySelectorAll('.nav-tab').forEach(btn => {
@@ -110,6 +137,14 @@ $CONFIG = $DPAI_CONFIG->get();
                 }
             }
         });
+        const page = document.getElementById("page-<?=DPAI_KEY?>")
+        window.addEventListener('DOMContentLoaded', () => {
+            const btns = page.querySelectorAll('[type="submit"]')
+            btns.forEach((e,i)=>e.addEventListener('click',(ele)=>{
+                btns[i].classList.add('loader')
+            }))
+        });
+
     </script>
 </div>
 <?php

@@ -19,6 +19,7 @@ require_once __DIR__ . '/libs/autoload.php';
 //DPAI_
 define("DPAI_KEY", 'DPAI');
 define("DPAI_CONFIG", 'DPAI_CONFIG');
+define("DPAI_DUPLICADOS", 'DPAI_DUPLICADOS');
 define("DPAI_LOG", true);
 define("DPAI_LOG_KEY", "DPAI_LOG");
 define("DPAI_LOG_COUNT", 100);

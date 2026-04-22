@@ -14,7 +14,7 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
         'type' => "save_config",
         'data' => $_POST
     ]);
-    $DPAI_CONFIG->set($CONFIG);
+    $DPAI_USE_DATA_CONFIG->set($CONFIG);
 }
 
 if (isset($CONFIG['apikey'])) {
@@ -76,7 +76,13 @@ if (isset($CONFIG['apikey'])) {
     </table>
 
     <div class="content-btn">
-        <?php submit_button('Guardar'); ?>
+            <button
+                type="submit"
+                name="submit"
+                value="Guardar"
+                class="button button-primary">
+                Guardar
+            </button>
     </div>
     <?php
     if (isset($respond_config)) {

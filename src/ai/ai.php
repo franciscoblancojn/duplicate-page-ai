@@ -6,8 +6,8 @@ class DPAI_AI
 {
     private static function getConfig()
     {
-        $DPAI_CONFIG = new DPAI_CONFIG();
-        return $DPAI_CONFIG->get();
+        $DPAI_USE_DATA_CONFIG = new DPAI_USE_DATA_CONFIG();
+        return $DPAI_USE_DATA_CONFIG->get();
     }
     private static function request(
         $url,

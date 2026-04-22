@@ -29,7 +29,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         'type' => "save_duplication",
         'data' => $_POST
     ]);
-    $DPAI_CONFIG->set($CONFIG);
+    $DPAI_USE_DATA_CONFIG->set($CONFIG);
 }
 
 ?>
@@ -110,7 +110,13 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     </table>
 
     <div class="content-btn">
-        <?php submit_button('Cargar Post'); ?>
+            <button
+                type="submit"
+                name="submit"
+                value="Cargar Post"
+                class="button button-primary">
+                Cargar Post
+            </button>
 
         <?php
         if (isset($post_id)) {
