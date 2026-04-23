@@ -15,40 +15,63 @@ class DPAI_AI
         $data = null,
     ) {
         $jsonResponse = [];
+
         try {
             $ch = curl_init($url);
+
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            // ⏱️ TIMEOUTS (CLAVE)
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30); // máximo total
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // conexión inicial
+
             if ($method == "POST") {
                 curl_setopt($ch, CURLOPT_POST, true);
             }
+
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Content-Type: application/json'
             ]);
+
             if (isset($data)) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             }
 
-            // 4. Ejecución y manejo de errores
             $response = curl_exec($ch);
 
+            // ❌ Error de cURL
             if (curl_errno($ch)) {
                 throw new \RuntimeException('Error en cURL: ' . curl_error($ch));
             }
 
+            // 📡 Código HTTP
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
             curl_close($ch);
 
-            // 5. Decodificar la respuesta
             $jsonResponse = json_decode($response, true);
 
-            if (isset($jsonResponse['error'])) {
-                throw new \RuntimeException('Error: ' . $jsonResponse['error']['message']);
+            // ❌ Manejo de rate limit o errores HTTP
+            if ($httpCode >= 400) {
+                throw new \RuntimeException(
+                    "HTTP Error {$httpCode}: " . ($jsonResponse['error']['message'] ?? 'Error desconocido')
+                );
             }
+
+            // ❌ Error de API (Google)
+            if (isset($jsonResponse['error'])) {
+                throw new \RuntimeException(
+                    'API Error: ' . $jsonResponse['error']['message']
+                );
+            }
+
             return [
                 "status" => "ok",
                 "message" => "Respuesta Exitosa",
                 'data' => $jsonResponse
-            ];;
+            ];
         } catch (\Throwable $th) {
+
             $error = [
                 "status" => "error",
                 "message" => $th->getMessage(),
@@ -58,10 +81,12 @@ class DPAI_AI
                     'jsonResponse' => $jsonResponse
                 ]
             ];
+
             FWUSystemLog::add(DPAI_KEY, [
                 'type' => "IA error",
                 'data' => $error
             ]);
+
             return $error;
         }
     }

@@ -23,15 +23,17 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         if (isset($prompt)) {
             $CONFIG['prompt'] = $prompt;
             $respond_duplicados = DPAI_DUPLICADOS::getDuplicados($post_id, $prompt, $customFields);
+            FWUSystemLog::add(DPAI_KEY, [
+                'type' => "respond_duplicados",
+                'data' => $respond_duplicados
+            ]);
             if ($respond_duplicados['status'] == 'ok') {
                 $POST_DATA = $DUPLICADOS[$post_id] ?? [];
                 $POST_DATA['post_id'] = $post_id;
                 $POST_DATA['customFields'] = $customFields;
-                $POST_DATA['variations'] ??=[];
+                $POST_DATA['variations'] ??= [];
                 $POST_DATA['variations'][$prompt] = $respond_duplicados['data'];
                 $DPAI_USE_DATA_DUPLICADOS->setField($post_id, $POST_DATA);
-                header("Location: " . $_SERVER['REQUEST_URI']);
-                exit;
             }
         }
     }

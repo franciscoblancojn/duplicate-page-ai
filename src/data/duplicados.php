@@ -109,12 +109,85 @@ class DPAI_USE_DATA_DUPLICADOS extends DPAI_USE_DATA_BASE
                     "status" => "ok",
                     "message" => "Duplicacion Exitosa.",
                     'data' => [
-                        "post_id"   => $new_post_id,
-                        'url'       => get_permalink($new_post_id),
+                        "post_id"       => $post_id,
+                        "new_post_id"   => $new_post_id,
+                        "title"         => $DATA['title'],
+                        'url'           => get_permalink($new_post_id),
                     ],
                 ];
             }
             throw new \RuntimeException('Variacion no existe.');
+        } catch (\Throwable $th) {
+            $error = [
+                "status" => "error",
+                "message" => $th->getMessage(),
+                'data' => [
+                    "post_id"   => $post_id,
+                    'line' => $th->getLine(),
+                    'file' => $th->getFile(),
+                ]
+            ];
+            FWUSystemLog::add(DPAI_KEY, [
+                'type' => "Duplicados error",
+                'data' => $error
+            ]);
+            return $error;
+        }
+    }
+    public function generateVariationWithData($post_id, $prompt, $DATA)
+    {
+        try {
+            $new_post_id = $this->generateDuplicado(
+                $post_id,
+                $DATA['title'],
+                $DATA['customFields'],
+            );
+            return [
+                "status" => "ok",
+                "message" => "Duplicacion Exitosa.",
+                'data' => [
+                    "post_id"       => $post_id,
+                    "new_post_id"   => $new_post_id,
+                    "title"         => $DATA['title'],
+                    'url'           => get_permalink($new_post_id),
+                ],
+            ];
+        } catch (\Throwable $th) {
+            $error = [
+                "status" => "error",
+                "message" => $th->getMessage(),
+                'data' => [
+                    "post_id"   => $post_id,
+                    'line' => $th->getLine(),
+                    'file' => $th->getFile(),
+                ]
+            ];
+            FWUSystemLog::add(DPAI_KEY, [
+                'type' => "Duplicados error",
+                'data' => $error
+            ]);
+            return $error;
+        }
+    }
+    public function generateAllVariations()
+    {
+        try {
+            $DUPLICADOS = $this->get();
+            $respond = [];
+            foreach ($DUPLICADOS as $post_id => $duplication) {
+                $variations = $duplication['variations'];
+                foreach ($variations as $prompt => $variation) {
+                    foreach ($variation as $v => $DATA) {
+                        $respond[] = $this->generateVariationWithData($post_id, $prompt, $DATA);
+                        $this->deleteVariation($post_id, $prompt, $v);
+                    }
+                }
+            }
+            return [
+                "status" => "ok",
+                "message" => "Duplicaciones Exitosas.",
+                'data' => $respond,
+            ];
         } catch (\Throwable $th) {
             $error = [
                 "status" => "error",

@@ -2,6 +2,7 @@
 // var_dump([
 //     "is_user_admin" => current_user_can( 'manage_options' )
 // ]);
+$DUPLICADOS = $DPAI_USE_DATA_DUPLICADOS->get();
 
 if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
     //PRUEBAS:
@@ -13,8 +14,12 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
     //OK: ELIMINAR TODOS
     if (isset($_POST['submit_delete']) && $_POST['submit_delete'] == 'delete_all') {
         $DPAI_USE_DATA_DUPLICADOS->set([]);
-        header("Location: " . $_SERVER['REQUEST_URI']);
-        exit;
+        $DUPLICADOS = $DPAI_USE_DATA_DUPLICADOS->get();
+        $respond_duplicates_pendding = [
+            "status" => "ok",
+            "message" => "Eiminacion Exitosa.",
+            'data' => [],
+        ];
     }
     //OK: ELIMINAR UNA VARIAION
     if (isset($_POST['submit_delete']) && $_POST['submit_delete'] != 'generate_all') {
@@ -22,11 +27,17 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
         $post_id = (int)$post_id;
         $v = (int)$v;
         $DPAI_USE_DATA_DUPLICADOS->deleteVariation($post_id, $prompt, $v);
-        header("Location: " . $_SERVER['REQUEST_URI']);
-        exit;
+        $DUPLICADOS = $DPAI_USE_DATA_DUPLICADOS->get();
+        $respond_duplicates_pendding = [
+            "status" => "ok",
+            "message" => "Eiminacion Exitosa.",
+            'data' => [],
+        ];
     }
-    // PENDING: GENERAR TODOS
+    // OK: GENERAR TODOS
     if (isset($_POST['submit_generate']) && $_POST['submit_generate'] == 'generate_all') {
+        $respond_duplicates_pendding_all = $DPAI_USE_DATA_DUPLICADOS->generateAllVariations();
+        $DUPLICADOS = $DPAI_USE_DATA_DUPLICADOS->get();
     }
     // OK: GENERAR UNO
     if (isset($_POST['submit_generate']) && $_POST['submit_generate'] != 'generate_all') {
@@ -246,13 +257,17 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
     </table>
 
     <?php
-    if (isset($respond_duplicates_pendding)) {
+
+    function getRespondDuplication($respond)
+    {
     ?>
-        <p class="message <?= $respond_duplicates_pendding['status'] ?>" data="<?= json_encode($respond_duplicates_pendding['data']) ?>">
-            <?= parseRespondMessage($respond_duplicates_pendding['message']); ?>
+        <p class="message <?= $respond['status'] ?>" data="<?= json_encode($respond['data']) ?>">
+            <?= (isset($respond['data']['post_id']) ? get_the_title($respond['data']['post_id']) : '') . " => "; ?>
+            <?= (isset($respond['data']['title']) ? ($respond['data']['title']) . " => " : ''); ?>
+            <?= parseRespondMessage($respond['message']); ?>
             <?php
-            if ($respond_duplicates_pendding['status'] == "ok") {
-                $data = $respond_duplicates_pendding['data'];
+            if ($respond['status'] == "ok") {
+                $data = $respond['data'];
                 if (isset($data['url'])) {
             ?>
                     <a href="<?php echo esc_url($data['url']); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary btn-to-right">
@@ -264,6 +279,19 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
             ?>
         </p>
     <?php
+    }
+
+    if (isset($respond_duplicates_pendding)) {
+        getRespondDuplication($respond_duplicates_pendding);
+    }
+    if (isset($respond_duplicates_pendding_all)) {
+        if ($respond_duplicates_pendding_all['status'] == 'error') {
+            getRespondDuplication($respond_duplicates_pendding_all);
+        } else {
+            foreach ($respond_duplicates_pendding_all['data'] as $key => $respond) {
+                getRespondDuplication($respond);
+            }
+        }
     }
     ?>
 </form>

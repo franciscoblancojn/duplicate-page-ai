@@ -23,7 +23,6 @@ $DPAI_USE_DATA_DUPLICADOS = new DPAI_USE_DATA_DUPLICADOS();
 $defaultTag =  $TAGS[0]['key'];
 
 $CONFIG = $DPAI_USE_DATA_CONFIG->get();
-$DUPLICADOS = $DPAI_USE_DATA_DUPLICADOS->get();
 
 $TAGS = [
     [
@@ -37,7 +36,6 @@ $TAGS = [
     [
         'key' => 'duplicates_pendding',
         'title' => 'Duplicados Pendientes',
-        'count' => count($DUPLICADOS)
     ],
 ];
 ?>
@@ -52,7 +50,6 @@ $TAGS = [
                 data-tab="<?= $value['key'] ?>"
                 href="#tag-<?= $value['key'] ?>">
                 <?= $value['title'] ?>
-                <?= isset($value['count']) && $value['count'] ? " (" . $value['count'] . ")" : "" ?>
             </a>
         <?php
         }
