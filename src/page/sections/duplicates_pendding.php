@@ -4,16 +4,38 @@
 // ]);
 
 if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
-    if (isset($_POST['submit']) && $_POST['submit'] = 'delete_all') {
+    //PRUEBAS:
+    if (isset($_POST['submit_test']) && $_POST['submit_test'] == 'submit_test') {
+        // $DPAI_USE_DATA_DUPLICADOS->set(json_decode('{"73":{"post_id":"73","customFields":{"titulo_principal":"Automatiza tu log\u00edstica.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta \u2013 Gratis y sin riesgos"},"variations":{"Genera una lista de variaciones para Cucuta, Medellin y Bogota en Colombia":[{"title":"Test - Cucuta","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en C\u00facuta.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en C\u00facuta m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en C\u00facuta \u2013 Gratis y sin riesgos"}},{"title":"Test - Medellin","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en Medell\u00edn.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en Medell\u00edn m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en Medell\u00edn \u2013 Gratis y sin riesgos"}},{"title":"Test - Bogota","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en Bogot\u00e1.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en Bogot\u00e1 m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en Bogot\u00e1 \u2013 Gratis y sin riesgos"}}]}}}',true));
+        header("Location: " . $_SERVER['REQUEST_URI']);
+        exit;
+    }
+    //OK: ELIMINAR TODOS
+    if (isset($_POST['submit_delete']) && $_POST['submit_delete'] == 'delete_all') {
         $DPAI_USE_DATA_DUPLICADOS->set([]);
         header("Location: " . $_SERVER['REQUEST_URI']);
         exit;
     }
-    if (isset($_POST['submit']) && $_POST['submit'] = 'generate_all') {
-        //PENDING:
+    //OK: ELIMINAR UNA VARIAION
+    if (isset($_POST['submit_delete']) && $_POST['submit_delete'] != 'generate_all') {
+        [$post_id, $prompt, $v] = explode(DPAI_KEY_SEPARETE, $_POST['submit_delete']);
+        $post_id = (int)$post_id;
+        $v = (int)$v;
+        $DPAI_USE_DATA_DUPLICADOS->deleteVariation($post_id, $prompt, $v);
+        header("Location: " . $_SERVER['REQUEST_URI']);
+        exit;
+    }
+    // PENDING: GENERAR TODOS
+    if (isset($_POST['submit_generate']) && $_POST['submit_generate'] == 'generate_all') {
+    }
+    // PENDING: GENERAR UNO
+    if (isset($_POST['submit_generate']) && $_POST['submit_generate'] != 'generate_all') {
+        [$post_id, $prompt, $v] = explode(DPAI_KEY_SEPARETE, $_POST['submit_delete']);
+        $post_id = (int)$post_id;
+        $v = (int)$v;
+        $DPAI_USE_DATA_DUPLICADOS->generateVariation($post_id, $prompt, $v);
     }
 }
-
 if (count($DUPLICADOS) == 0) {
 ?>
     <h3>
@@ -27,24 +49,31 @@ if (count($DUPLICADOS) == 0) {
         <input type="hidden" name="save" value="duplicates_pendding">
         <div class="content-title-btn">
             <h3>
-            Lista de Duplicaciones de paginas.
-        </h3>
-        <div class="content-btn">
-            <button
-                type="submit"
-                name="submit"
-                value="delete_all"
-                class="button button-primary">
-                Eliminar todos
-            </button>
-            <button
-                type="submit"
-                name="submit"
-                value="generate_all"
-                class="button button-primary">
-                Generar todos
-            </button>
-        </div>
+                Lista de Duplicaciones de paginas.
+            </h3>
+            <div class="content-btn">
+                <!-- <button
+                    type="submit"
+                    name="submit_test"
+                    value="submit_test"
+                    class="button button-primary">
+                    Test
+                </button> -->
+                <button
+                    type="submit"
+                    name="submit_delete"
+                    value="delete_all"
+                    class="button button-primary">
+                    Eliminar todos
+                </button>
+                <button
+                    type="submit"
+                    name="submit_generate"
+                    value="generate_all"
+                    class="button button-primary">
+                    Generar todos
+                </button>
+            </div>
         </div>
 
         <table class="form-table">
@@ -112,7 +141,7 @@ if (count($DUPLICADOS) == 0) {
                     <td colspan="2">
                         <table class="form-table">
                             <?php
-                            foreach ($variations as $key => $variation) {
+                            foreach ($variations as $prompt => $variation) {
                             ?>
                                 <tr>
                                     <th scope="row">
@@ -121,8 +150,7 @@ if (count($DUPLICADOS) == 0) {
                                         </label>
                                     </th>
                                     <td>
-                                        <?= $key ?>
-                                        <?= json_encode($value) ?>
+                                        <?= $prompt ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -174,11 +202,10 @@ if (count($DUPLICADOS) == 0) {
                                                         </a>
                                                     </td>
                                                     <td>
-
                                                         <button
                                                             type="submit"
-                                                            name="submit"
-                                                            value="generar"
+                                                            name="submit_delete"
+                                                            value="<?= $post_id . DPAI_KEY_SEPARETE . $prompt . DPAI_KEY_SEPARETE . $v ?>"
                                                             class="button button-primary">
                                                             Eliminar
                                                         </button>
@@ -187,8 +214,8 @@ if (count($DUPLICADOS) == 0) {
 
                                                         <button
                                                             type="submit"
-                                                            name="submit"
-                                                            value="generar"
+                                                            name="submit_generate"
+                                                            value="<?= $post_id . DPAI_KEY_SEPARETE . $prompt . DPAI_KEY_SEPARETE . $v ?>"
                                                             class="button button-primary">
                                                             Generar
                                                         </button>
