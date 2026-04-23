@@ -30,7 +30,6 @@ class DPAI_WP_JSON
 
         if (!empty($matches[1])) {
             foreach ($matches[1] as $key) {
-                if (strpos($key, DPAI_KEY) !== 0) continue;
                 $value = get_post_meta($post_id, $key, true);
                 $result[$key] = $value;
             }
@@ -68,9 +67,6 @@ class DPAI_WP_JSON
         }
         // Recorrer campos
         foreach ($data as $key => $value) {
-
-            // Solo permitir campos que empiecen con DPAI_
-            if (strpos($key, DPAI_KEY) !== 0) continue;
 
             // Sanitizar (puedes mejorar según tipo)
             $sanitized = is_array($value)

@@ -37,4 +37,12 @@ class DPAI_USE_DATA_BASE
         $this->DATA = $DATA;
         $this->onSave();
     }
+    public function add($DATA)
+    {
+        $this->DATA = [
+            ...$this->DATA,
+            ...$DATA,
+        ];
+        $this->onSave();
+    }
 }

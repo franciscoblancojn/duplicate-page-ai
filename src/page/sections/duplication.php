@@ -23,6 +23,16 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         if (isset($prompt)) {
             $CONFIG['prompt'] = $prompt;
             $respond_duplicados = DPAI_DUPLICADOS::getDuplicados($post_id, $prompt, $customFields);
+            if ($respond_duplicados['status'] == 'ok') {
+                $POST_DATA = $DUPLICADOS[$post_id] ?? [];
+                $POST_DATA['post_id'] = $post_id;
+                $POST_DATA['customFields'] = $customFields;
+                $POST_DATA['variations'] ??=[];
+                $POST_DATA['variations'][$prompt] = $respond_duplicados['data'];
+                $DPAI_USE_DATA_DUPLICADOS->setField($post_id, $POST_DATA);
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit;
+            }
         }
     }
     FWUSystemLog::add(DPAI_KEY, [
@@ -110,13 +120,13 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     </table>
 
     <div class="content-btn">
-            <button
-                type="submit"
-                name="submit"
-                value="Cargar Post"
-                class="button button-primary">
-                Cargar Post
-            </button>
+        <button
+            type="submit"
+            name="submit"
+            value="Cargar Post"
+            class="button button-primary">
+            Cargar Post
+        </button>
 
         <?php
         if (isset($post_id)) {
@@ -156,9 +166,9 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         <?php
         if (isset($respond_duplicados)) {
         ?>
-                <p class="message <?= $respond_duplicados['status'] ?>">
-                    <?= parseRespondMessage($respond_duplicados['message']); ?>
-                </p>
+            <p class="message <?= $respond_duplicados['status'] ?>">
+                <?= parseRespondMessage($respond_duplicados['message']); ?>
+            </p>
         <?php
         }
         ?>
