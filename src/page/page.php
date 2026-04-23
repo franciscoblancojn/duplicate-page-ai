@@ -89,6 +89,9 @@ $TAGS = [
             bottom: .5rem;
             padding: 1rem;
             border-radius: .5rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .error {
@@ -138,6 +141,7 @@ $TAGS = [
             flex-wrap: wrap;
             align-items: center;
         }
+
         .content-title-btn {
             display: flex;
             gap: 1rem;
@@ -246,6 +250,10 @@ $TAGS = [
             border-top: 1px solid #dcdcde;
             max-height: 75dvh;
             overflow: auto;
+        }
+
+        .btn-to-right.btn-to-right {
+            margin-left: auto;
         }
     </style>
     <script>
