@@ -83,7 +83,7 @@ $TAGS = [
             font-weight: 900;
             position: sticky;
             left: 0;
-            bottom: .5rem;
+            top: .5rem;
             padding: 1rem;
             border-radius: .5rem;
             display: flex;

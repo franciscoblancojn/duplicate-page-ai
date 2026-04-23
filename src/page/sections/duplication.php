@@ -11,11 +11,21 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     $post_id = $_POST['post_id'] ?? $CONFIG['post_id'];
     if (isset($post_id)) {
         $CONFIG['post_id'] = $post_id;
+        $respond_duplicados = [
+            "status" => "ok",
+            "message" => "Post Cargado.",
+            'data' => [],
+        ];
     }
     if (isset($post_id) && isset($_POST['set_custom_field']) && $_POST['set_custom_field'] == "1") {
         $customFields = $_POST['customFields'] ?? [];
         if (!empty($customFields)) {
             DPAI_WP_JSON::setCustomFields($post_id, $customFields);
+            $respond_duplicados = [
+                "status" => "ok",
+                "message" => "Campos personalisados Guardados.",
+                'data' => [],
+            ];
         }
     }
     if (isset($post_id) && isset($_POST['generate_duplicate']) && $_POST['generate_duplicate'] == "1") {
@@ -46,6 +56,15 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
 
 ?>
 <form method="post">
+    <?php
+    if (isset($respond_duplicados)) {
+    ?>
+        <p class="message <?= $respond_duplicados['status'] ?>">
+            <?= parseRespondMessage($respond_duplicados['message']); ?>
+        </p>
+    <?php
+    }
+    ?>
     <input type="hidden" name="save" value="duplication">
     <table class="form-table">
         <tr>
@@ -165,15 +184,6 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
             class="button">
             Generar Duplicados
         </button>
-        <?php
-        if (isset($respond_duplicados)) {
-        ?>
-            <p class="message <?= $respond_duplicados['status'] ?>">
-                <?= parseRespondMessage($respond_duplicados['message']); ?>
-            </p>
-        <?php
-        }
-        ?>
     <?php
     }
     ?>

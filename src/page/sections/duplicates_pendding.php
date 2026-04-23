@@ -50,6 +50,45 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
 }
 ?>
 <form method="post">
+
+    <?php
+
+    function getRespondDuplication($respond)
+    {
+    ?>
+        <p class="message <?= $respond['status'] ?>" data="<?= json_encode($respond['data']) ?>">
+            <?= (isset($respond['data']['post_id']) ? get_the_title($respond['data']['post_id']) : '') . " => "; ?>
+            <?= (isset($respond['data']['title']) ? ($respond['data']['title']) . " => " : ''); ?>
+            <?= parseRespondMessage($respond['message']); ?>
+            <?php
+            if ($respond['status'] == "ok") {
+                $data = $respond['data'];
+                if (isset($data['url'])) {
+            ?>
+                    <a href="<?php echo esc_url($data['url']); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary btn-to-right">
+                        Ver Pagina
+                    </a>
+            <?php
+                }
+            }
+            ?>
+        </p>
+    <?php
+    }
+
+    if (isset($respond_duplicates_pendding)) {
+        getRespondDuplication($respond_duplicates_pendding);
+    }
+    if (isset($respond_duplicates_pendding_all)) {
+        if ($respond_duplicates_pendding_all['status'] == 'error') {
+            getRespondDuplication($respond_duplicates_pendding_all);
+        } else {
+            foreach ($respond_duplicates_pendding_all['data'] as $key => $respond) {
+                getRespondDuplication($respond);
+            }
+        }
+    }
+    ?>
     <input type="hidden" name="save" value="duplicates_pendding">
     <?php
     if (count($DUPLICADOS) == 0) {
@@ -256,42 +295,4 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
 
     </table>
 
-    <?php
-
-    function getRespondDuplication($respond)
-    {
-    ?>
-        <p class="message <?= $respond['status'] ?>" data="<?= json_encode($respond['data']) ?>">
-            <?= (isset($respond['data']['post_id']) ? get_the_title($respond['data']['post_id']) : '') . " => "; ?>
-            <?= (isset($respond['data']['title']) ? ($respond['data']['title']) . " => " : ''); ?>
-            <?= parseRespondMessage($respond['message']); ?>
-            <?php
-            if ($respond['status'] == "ok") {
-                $data = $respond['data'];
-                if (isset($data['url'])) {
-            ?>
-                    <a href="<?php echo esc_url($data['url']); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary btn-to-right">
-                        Ver Pagina
-                    </a>
-            <?php
-                }
-            }
-            ?>
-        </p>
-    <?php
-    }
-
-    if (isset($respond_duplicates_pendding)) {
-        getRespondDuplication($respond_duplicates_pendding);
-    }
-    if (isset($respond_duplicates_pendding_all)) {
-        if ($respond_duplicates_pendding_all['status'] == 'error') {
-            getRespondDuplication($respond_duplicates_pendding_all);
-        } else {
-            foreach ($respond_duplicates_pendding_all['data'] as $key => $respond) {
-                getRespondDuplication($respond);
-            }
-        }
-    }
-    ?>
 </form>
