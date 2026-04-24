@@ -54,7 +54,7 @@ class DPAI_AI
             // ❌ Manejo de rate limit o errores HTTP
             if ($httpCode >= 400) {
                 throw new \RuntimeException(
-                    "HTTP Error {$httpCode}: " . ($jsonResponse['error']['message'] ?? 'Error desconocido')
+                    'API Error: ' . ($jsonResponse['error']['message'] ?? 'Error desconocido')
                 );
             }
 

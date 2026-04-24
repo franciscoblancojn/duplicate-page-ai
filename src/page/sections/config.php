@@ -29,11 +29,7 @@ if (isset($_POST['save']) && $_POST['save'] == "config") {
 <form method="post">
     <?php
     if (isset($respond_config)) {
-    ?>
-        <p class="message <?= $respond_config['status'] ?>">
-            <?= parseRespondMessage($respond_config['message']); ?>
-        </p>
-    <?php
+        getRespond($respond_config);
     }
     ?>
     <input type="hidden" name="save" value="config">

@@ -16,7 +16,27 @@ function parseRespondMessage($text)
         $text
     );
 }
-
+function getRespond($respond)
+{
+?>
+    <p class="message <?= $respond['status'] ?>" data="<?= json_encode($respond['data']) ?>">
+        <?= (isset($respond['data']['post_id']) ? get_the_title($respond['data']['post_id']) . " => " : ''); ?>
+        <?= (isset($respond['data']['title']) ? ($respond['data']['title']) . " => " : ''); ?>
+        <?= parseRespondMessage($respond['message']); ?>
+        <?php
+        if ($respond['status'] == "ok") {
+            if (isset($respond['data']['url'])) {
+            ?>
+                <a href="<?php echo esc_url($respond['data']['url']); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary btn-to-right">
+                    Ver Pagina
+                </a>
+            <?php
+            }
+        }
+        ?>
+    </p>
+<?php
+}
 $DPAI_USE_DATA_CONFIG = new DPAI_USE_DATA_CONFIG();
 $DPAI_USE_DATA_DUPLICADOS = new DPAI_USE_DATA_DUPLICADOS();
 
@@ -83,12 +103,13 @@ $TAGS = [
             font-weight: 900;
             position: sticky;
             left: 0;
-            top: .5rem;
+            top: 2.5rem;
             padding: 1rem;
             border-radius: .5rem;
             display: flex;
             align-items: center;
             flex-wrap: wrap;
+            z-index: 10;
         }
 
         .error {

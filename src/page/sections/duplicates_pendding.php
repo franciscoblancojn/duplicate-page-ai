@@ -6,8 +6,8 @@ $DUPLICADOS = $DPAI_USE_DATA_DUPLICADOS->get();
 
 if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
     //PRUEBAS:
-    if (isset($_POST['submit_test']) && $_POST['submit_test'] == 'submit_test') {
-        // $DPAI_USE_DATA_DUPLICADOS->set(json_decode('{"73":{"post_id":"73","customFields":{"titulo_principal":"Automatiza tu log\u00edstica.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta \u2013 Gratis y sin riesgos"},"variations":{"Genera una lista de variaciones para Cucuta, Medellin y Bogota en Colombia":[{"title":"Test - Cucuta","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en C\u00facuta.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en C\u00facuta m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en C\u00facuta \u2013 Gratis y sin riesgos"}},{"title":"Test - Medellin","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en Medell\u00edn.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en Medell\u00edn m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en Medell\u00edn \u2013 Gratis y sin riesgos"}},{"title":"Test - Bogota","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en Bogot\u00e1.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en Bogot\u00e1 m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en Bogot\u00e1 \u2013 Gratis y sin riesgos"}}]}}}',true));
+    if (DPAI_MODE_DEV && isset($_POST['submit_test']) && $_POST['submit_test'] == 'submit_test') {
+        $DPAI_USE_DATA_DUPLICADOS->set(json_decode('{"73":{"post_id":"73","customFields":{"titulo_principal":"Automatiza tu log\u00edstica.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta \u2013 Gratis y sin riesgos"},"variations":{"Genera una lista de variaciones para Cucuta, Medellin y Bogota en Colombia":[{"title":"Test - Cucuta","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en C\u00facuta.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en C\u00facuta m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en C\u00facuta \u2013 Gratis y sin riesgos"}},{"title":"Test - Medellin","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en Medell\u00edn.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en Medell\u00edn m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en Medell\u00edn \u2013 Gratis y sin riesgos"}},{"title":"Test - Bogota","customFields":{"titulo_principal":"Automatiza tu log\u00edstica en Bogot\u00e1.","titulo_secundario":"Protege tu flujo de caja. Escala sin fricciones.","descripccion_principal":"Aveonline pone al servicio de tu comercio electr\u00f3nico en Bogot\u00e1 m\u00e1s de 12 a\u00f1os de experiencia, tecnolog\u00eda con inteligencia artificial y automatizaciones listas para usar. Olv\u00eddate de desarrollos costosos: desde la validaci\u00f3n de direcciones hasta el recaudo, todo funciona para ti desde el primer clic.","btn_register_text":"Activa tu cuenta en Bogot\u00e1 \u2013 Gratis y sin riesgos"}}]}}}', true));
         header("Location: " . $_SERVER['REQUEST_URI']);
         exit;
     }
@@ -50,41 +50,16 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
 }
 ?>
 <form method="post">
-
     <?php
-
-    function getRespondDuplication($respond)
-    {
-    ?>
-        <p class="message <?= $respond['status'] ?>" data="<?= json_encode($respond['data']) ?>">
-            <?= (isset($respond['data']['post_id']) ? get_the_title($respond['data']['post_id']) : '') . " => "; ?>
-            <?= (isset($respond['data']['title']) ? ($respond['data']['title']) . " => " : ''); ?>
-            <?= parseRespondMessage($respond['message']); ?>
-            <?php
-            if ($respond['status'] == "ok") {
-                $data = $respond['data'];
-                if (isset($data['url'])) {
-            ?>
-                    <a href="<?php echo esc_url($data['url']); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary btn-to-right">
-                        Ver Pagina
-                    </a>
-            <?php
-                }
-            }
-            ?>
-        </p>
-    <?php
-    }
-
     if (isset($respond_duplicates_pendding)) {
-        getRespondDuplication($respond_duplicates_pendding);
+        getRespond($respond_duplicates_pendding);
     }
     if (isset($respond_duplicates_pendding_all)) {
         if ($respond_duplicates_pendding_all['status'] == 'error') {
-            getRespondDuplication($respond_duplicates_pendding_all);
+            getRespond($respond_duplicates_pendding_all);
         } else {
             foreach ($respond_duplicates_pendding_all['data'] as $key => $respond) {
-                getRespondDuplication($respond);
+                getRespond($respond);
             }
         }
     }
@@ -96,6 +71,19 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
         <h3>
             No tienes duplicaciones de paginas pendientes.
         </h3>
+        <?php
+        if (DPAI_MODE_DEV) {
+        ?>
+            <button
+                type="submit"
+                name="submit_test"
+                value="submit_test"
+                class="button button-primary">
+                Test
+            </button>
+        <?php
+        }
+        ?>
     <?php
     } else {
     ?>
@@ -104,13 +92,19 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
                 Lista de Duplicaciones de paginas.
             </h3>
             <div class="content-btn">
-                <!-- <button
-                    type="submit"
-                    name="submit_test"
-                    value="submit_test"
-                    class="button button-primary">
-                    Test
-                </button> -->
+                <?php
+                if (DPAI_MODE_DEV) {
+                ?>
+                    <button
+                        type="submit"
+                        name="submit_test"
+                        value="submit_test"
+                        class="button button-primary">
+                        Test
+                    </button>
+                <?php
+                }
+                ?>
                 <button
                     type="submit"
                     name="submit_delete"

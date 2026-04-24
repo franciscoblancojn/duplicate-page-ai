@@ -58,11 +58,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
 <form method="post">
     <?php
     if (isset($respond_duplicados)) {
-    ?>
-        <p class="message <?= $respond_duplicados['status'] ?>">
-            <?= parseRespondMessage($respond_duplicados['message']); ?>
-        </p>
-    <?php
+        getRespond($respond_duplicados);
     }
     ?>
     <input type="hidden" name="save" value="duplication">
