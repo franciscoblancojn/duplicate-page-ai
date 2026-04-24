@@ -10,12 +10,15 @@ class DPAI_YOAST
             'methods' => 'GET',
             'callback' => [self::class, 'GET_Enpoint'],
         ]);
+
         register_rest_route(DPAI_KEY, '/yoast/set', [
             'methods' => 'POST',
             'callback' => [self::class, 'SET_Enpoint'],
         ]);
     }
-    public static  function GET($post_id)
+
+    // ---------------- GET ----------------
+    public static function GET($post_id)
     {
         $all_meta = get_post_meta($post_id);
         $yoast = [];
@@ -28,45 +31,100 @@ class DPAI_YOAST
 
         return $yoast;
     }
+
     public static function GET_Enpoint($request)
     {
         $post_id = $request->get_param('post_id');
+
         if (!$post_id) {
             return [
                 'success' => false,
                 'message' => 'post_id es requerido'
             ];
         }
+
         $post_id = intval($post_id);
-        return self::GET($post_id);
-    }
-    public static function SET($post_id, $data)
-    {
-        $result = [];
-        // Validar post_id
-        if (empty($post_id)) {
-            return [
-                'success' => false,
-                'message' => 'post_id es requerido'
-            ];
-        }
-        $post_id = intval($post_id);
+
         if (!get_post($post_id)) {
             return [
                 'success' => false,
                 'message' => 'Post no existe'
             ];
         }
+
+        return self::GET($post_id);
+    }
+
+    // ---------------- SET ----------------
+    public static function SET($post_id, $data)
+    {
+        $result = [];
+
+        // Validaciones
+        if (empty($post_id)) {
+            return [
+                'success' => false,
+                'message' => 'post_id es requerido'
+            ];
+        }
+
+        $post_id = intval($post_id);
+
+        if (!get_post($post_id)) {
+            return [
+                'success' => false,
+                'message' => 'Post no existe'
+            ];
+        }
+
+        // 🔥 SOLO guardar claves de Yoast
+        foreach ($data as $key => $value) {
+
+            if (strpos($key, '_yoast_wpseo_') !== 0) {
+                continue;
+            }
+
+            // Sanitizar según tipo
+            if (is_array($value)) {
+                $value = wp_json_encode($value);
+            } else {
+                $value = sanitize_text_field($value);
+            }
+
+            update_post_meta($post_id, $key, $value);
+
+            $result[$key] = $value;
+        }
+
+        // if (function_exists('wpseo_init')) {
+        //     do_action('save_post', $post_id);
+        // }
+
         FWUSystemLog::add(DPAI_KEY, [
             'type' => "DPAI_YOAST SET",
+            'post_id' => $post_id,
             'data' => $data,
             'result' => $result,
         ]);
-        return $result;
+
+        return [
+            'success' => true,
+            'message' => 'Yoast actualizado correctamente',
+            'data' => $result
+        ];
     }
+
     public static function SET_Enpoint($request)
     {
         $data = $request->get_json_params();
+
+        if (empty($data['post_id'])) {
+            return [
+                'success' => false,
+                'message' => 'post_id es requerido'
+            ];
+        }
+
         return self::SET($data['post_id'], $data);
     }
 }

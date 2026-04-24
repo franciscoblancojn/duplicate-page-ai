@@ -4,7 +4,7 @@ use franciscoblancojn\wordpress_utils\FWUSystemLog;
 
 class DPAI_DUPLICADOS
 {
-    public static function getPrompt($post_id, $prompt, $customFields)
+    public static function getPrompt($post_id, $prompt, $customFields, $yoastFields)
     {
         $title = get_the_title($post_id);
         $content = get_post_field('post_content', $post_id);
@@ -15,13 +15,15 @@ class DPAI_DUPLICADOS
             " . $content . "
             ----CAMPOS PERSONALIZADOS----
             " . json_encode($customFields) . "
+            ----DATOS DE YOAST SEO----
+            " . json_encode($yoastFields) . "
             ----PROMP BASE----
             " . $prompt . "
             ----
-            Necesito que generes un json basandote en el contenido y cambos personalizados como referencia.
-            Formato de json : {title:'title',customFields:{key:'value',...}}
+            Necesito que generes un json basandote en el contenido, campos personalizados y datos de yoast seo como referencia.
+            Formato de json : {title:'title',customFields:{key:'value',...},yoastFields:{key:'value',...}}
             En caso que se pidan varias respuesta este es el formato a usar:
-            Formato de array : [{title:'title',customFields:{key:'value',...}},{title:'title2',customFields:{key:'value',...}}]
+            Formato de array : [{title:'title',customFields:{key:'value',...},yoastFields:{key:'value',...}},{title:'title2',customFields:{key:'value',...},yoastFields:{key:'value',...}}]
             Importante, ten en cuenta el prompt base.
         ";
         return $PROMPT;
@@ -31,7 +33,7 @@ class DPAI_DUPLICADOS
         $jsonResponse = [];
         try {
             $result = DPAI_AI::sendPrompt($PROMPT);
-            
+
             if ($result['status'] == 'error') {
                 return $result;
             }
@@ -53,12 +55,20 @@ class DPAI_DUPLICADOS
         }
     }
 
-    public static function getDuplicados($post_id, $prompt, $customFields)
+    public static function getDuplicados($post_id, $prompt, $customFields, $yoastFields)
     {
         $jsonResponse = [];
         try {
-            $PROMPT = self::getPrompt($post_id, $prompt, $customFields);
+            $PROMPT = self::getPrompt($post_id, $prompt, $customFields, $yoastFields);
             $result = self::getDuplicadosByPrompt($PROMPT);
+            FWUSystemLog::add(DPAI_KEY, [
+                'type' => "IA Duplicados result",
+                'post_id' => $post_id,
+                'prompt' => $prompt,
+                'customFields' => $customFields,
+                'yoastFields' => $yoastFields,
+                'result' => $result,
+            ]);
             return $result;
         } catch (\Throwable $th) {
             $error = [

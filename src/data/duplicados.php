@@ -39,7 +39,7 @@ class DPAI_USE_DATA_DUPLICADOS extends DPAI_USE_DATA_BASE
             }
         }
     }
-    private function generateDuplicado($post_id, $title, $custom_fields = [])
+    private function generateDuplicado($post_id, $title, $custom_fields = [],$yoastFields = [])
     {
         $post = get_post($post_id);
 
@@ -82,6 +82,10 @@ class DPAI_USE_DATA_DUPLICADOS extends DPAI_USE_DATA_BASE
         foreach ($custom_fields as $key => $value) {
             update_post_meta($new_post_id, $key, $value);
         }
+        // 4. Sobrescribir SOLO los yoast fields que envías
+        foreach ($yoastFields as $key => $value) {
+            update_post_meta($new_post_id, $key, $value);
+        }
         update_post_meta($new_post_id, DPAI_KEY . "_PARENT", $post_id);
 
         //PENDING: generar img con IA
@@ -104,6 +108,7 @@ class DPAI_USE_DATA_DUPLICADOS extends DPAI_USE_DATA_BASE
                     $post_id,
                     $DATA['title'],
                     $DATA['customFields'],
+                    $DATA['yoastFields'],
                 );
                 $this->deleteVariation($post_id, $prompt, $v);
                 return [
@@ -142,6 +147,7 @@ class DPAI_USE_DATA_DUPLICADOS extends DPAI_USE_DATA_BASE
                 $post_id,
                 $DATA['title'],
                 $DATA['customFields'],
+                $DATA['yoastFields'],
             );
             return [
                 "status" => "ok",

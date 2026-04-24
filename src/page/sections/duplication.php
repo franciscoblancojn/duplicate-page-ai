@@ -4,6 +4,7 @@ use franciscoblancojn\wordpress_utils\FWUSystemLog;
 
 $post_id = $CONFIG['post_id'];
 $customFields = [];
+$yoastFields = [];
 if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     $post_id = $_POST['post_id'] ?? $CONFIG['post_id'];
     if (isset($post_id)) {
@@ -24,12 +25,23 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
                 'data' => [],
             ];
         }
+        $yoastFields = $_POST['yoastFields'] ?? [];
+        if (!empty($yoastFields)) {
+            DPAI_YOAST::SET($post_id, $yoastFields);
+            $respond_duplicados = [
+                "status" => "ok",
+                "message" => "Campos personalisados Guardados.",
+                'data' => [],
+            ];
+        }
     }
     if (isset($post_id) && isset($_POST['generate_duplicate']) && $_POST['generate_duplicate'] == "1") {
         $prompt = $_POST['prompt'];
         if (isset($prompt)) {
             $CONFIG['prompt'] = $prompt;
-            $respond_duplicados = DPAI_DUPLICADOS::getDuplicados($post_id, $prompt, $customFields);
+            $customFields = DPAI_CF::GET($post_id);
+            $yoastFields = DPAI_YOAST::GET($post_id);
+            $respond_duplicados = DPAI_DUPLICADOS::getDuplicados($post_id, $prompt, $customFields, $yoastFields);
             FWUSystemLog::add(DPAI_KEY, [
                 'type' => "respond_duplicados",
                 'data' => $respond_duplicados
@@ -38,6 +50,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
                 $POST_DATA = $DUPLICADOS[$post_id] ?? [];
                 $POST_DATA['post_id'] = $post_id;
                 $POST_DATA['customFields'] = $customFields;
+                $POST_DATA['yoastFields'] = $yoastFields;
                 $POST_DATA['variations'] ??= [];
                 $POST_DATA['variations'][$prompt] = $respond_duplicados['data'];
                 $DPAI_USE_DATA_DUPLICADOS->setField($post_id, $POST_DATA);
@@ -52,6 +65,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
 }
 if (isset($post_id)) {
     $customFields = DPAI_CF::GET($post_id);
+    $yoastFields = DPAI_YOAST::GET($post_id);
 }
 
 ?>
@@ -133,6 +147,48 @@ if (isset($post_id)) {
                     </table>
                 </td>
             </tr>
+            <?php
+            if (function_exists('YoastSEO')) {
+            ?>
+                <tr>
+                    <th scope="row">
+                        <label for="post_id">
+                            Yoast Seo
+                            <?= tooltip('Campos que usa el plugin Yoast Seo.') ?>
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <table class="form-table">
+                            <?php
+                            foreach ($yoastFields as $key => $value) {
+                            ?>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="<?= $key ?>">
+                                            <?= $key ?>
+                                        </label>
+                                    </th>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            id="<?= $key ?>"
+                                            name="yoastFields[<?= $key ?>]"
+                                            placeholder="<?= $key ?>"
+                                            value="<?= esc_attr($value) ?>"
+                                            class="regular-text" />
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                            ?>
+                        </table>
+                    </td>
+                </tr>
+            <?php
+            }
+            ?>
         <?php
         }
         ?>
