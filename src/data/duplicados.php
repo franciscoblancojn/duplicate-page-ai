@@ -84,6 +84,7 @@ class DPAI_USE_DATA_DUPLICADOS extends DPAI_USE_DATA_BASE
         }
         update_post_meta($new_post_id, DPAI_KEY . "_PARENT", $post_id);
 
+        //PENDING: generar img con IA
         $thumbnail_id = get_post_thumbnail_id($post_id);
         if ($thumbnail_id) {
             set_post_thumbnail($new_post_id, $thumbnail_id);
@@ -179,10 +180,11 @@ class DPAI_USE_DATA_DUPLICADOS extends DPAI_USE_DATA_BASE
                 foreach ($variations as $prompt => $variation) {
                     foreach ($variation as $v => $DATA) {
                         $respond[] = $this->generateVariationWithData($post_id, $prompt, $DATA);
-                        $this->deleteVariation($post_id, $prompt, $v);
+                        // $this->deleteVariation($post_id, $prompt, $v);
                     }
                 }
             }
+            $this->set([]);
             return [
                 "status" => "ok",
                 "message" => "Duplicaciones Exitosas.",

@@ -17,7 +17,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     if (isset($post_id) && isset($_POST['set_custom_field']) && $_POST['set_custom_field'] == "1") {
         $customFields = $_POST['customFields'] ?? [];
         if (!empty($customFields)) {
-            DPAI_WP_JSON::setCustomFields($post_id, $customFields);
+            DPAI_CF::SET($post_id, $customFields);
             $respond_duplicados = [
                 "status" => "ok",
                 "message" => "Campos personalisados Guardados.",
@@ -51,7 +51,7 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     $DPAI_USE_DATA_CONFIG->set($CONFIG);
 }
 if (isset($post_id)) {
-    $customFields = DPAI_WP_JSON::getCustomFields($post_id);
+    $customFields = DPAI_CF::GET($post_id);
 }
 
 ?>

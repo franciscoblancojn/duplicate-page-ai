@@ -2,54 +2,52 @@
 
 use franciscoblancojn\wordpress_utils\FWUSystemLog;
 
-class DPAI_WP_JSON
+class DPAI_CF
 {
     public static function init()
     {
-        register_rest_route(DPAI_KEY, '/get-custom-fields', [
+        register_rest_route(DPAI_KEY, '/cf/get', [
             'methods' => 'GET',
-            'callback' => [self::class, 'getCustomFieldsEnpoint'],
+            'callback' => [self::class, 'GET_Enpoint'],
         ]);
-        register_rest_route(DPAI_KEY, '/set-custom-fields', [
+        register_rest_route(DPAI_KEY, '/cf/set', [
             'methods' => 'POST',
-            'callback' => [self::class, 'setCustomFieldsEnpoint'],
+            'callback' => [self::class, 'SET_Enpoint'],
         ]);
     }
     private static function extractKeys($data, &$keys)
-{
-    if (is_array($data)) {
-        foreach ($data as $key => $value) {
+    {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
 
-            // 🔥 también revisar claves (por si acaso)
-            if (is_string($key)) {
-                self::extractKeys($key, $keys);
+                // 🔥 también revisar claves (por si acaso)
+                if (is_string($key)) {
+                    self::extractKeys($key, $keys);
+                }
+
+                self::extractKeys($value, $keys);
             }
+        } elseif (is_object($data)) {
 
-            self::extractKeys($value, $keys);
-        }
+            foreach ((array)$data as $value) {
+                self::extractKeys($value, $keys);
+            }
+        } elseif (is_string($data)) {
 
-    } elseif (is_object($data)) {
+            if (preg_match_all('/{{(.*?)}}|__(.*?)__/', $data, $matches)) {
 
-        foreach ((array)$data as $value) {
-            self::extractKeys($value, $keys);
-        }
+                $foundKeys = array_merge(
+                    array_filter($matches[1]),
+                    array_filter($matches[2])
+                );
 
-    } elseif (is_string($data)) {
-
-        if (preg_match_all('/{{(.*?)}}|__(.*?)__/', $data, $matches)) {
-
-            $foundKeys = array_merge(
-                array_filter($matches[1]),
-                array_filter($matches[2])
-            );
-
-            foreach ($foundKeys as $key) {
-                $keys[] = trim($key);
+                foreach ($foundKeys as $key) {
+                    $keys[] = trim($key);
+                }
             }
         }
     }
-}
-    public static function getCustomFields($post_id)
+    public static function GET($post_id)
     {
         if (!get_post($post_id)) {
             return [
@@ -90,7 +88,7 @@ class DPAI_WP_JSON
 
         return $result;
     }
-    public static function getCustomFieldsEnpoint($request)
+    public static function GET_Enpoint($request)
     {
         $post_id = $request->get_param('post_id');
         if (!$post_id) {
@@ -100,9 +98,9 @@ class DPAI_WP_JSON
             ];
         }
         $post_id = intval($post_id);
-        return self::getCustomFields($post_id);
+        return self::GET($post_id);
     }
-    public static function setCustomFields($post_id, $data)
+    public static function SET($post_id, $data)
     {
         $result = [];
         // Validar post_id
@@ -134,17 +132,17 @@ class DPAI_WP_JSON
 
 
         FWUSystemLog::add(DPAI_KEY, [
-            'type' => "setCustomFields",
+            'type' => "DPAI_CF SET",
             'data' => $data,
             'result' => $result,
         ]);
         return $result;
     }
-    public static function setCustomFieldsEnpoint($request)
+    public static function SET_Enpoint($request)
     {
         $data = $request->get_json_params();
-        return self::setCustomFields($data['post_id'], $data);
+        return self::SET($data['post_id'], $data);
     }
 }
 
-add_action('rest_api_init', ['DPAI_WP_JSON', 'init']);
+// add_action('rest_api_init', ['DPAI_CF', 'init']);
