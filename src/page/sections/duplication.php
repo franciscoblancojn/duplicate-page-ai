@@ -4,9 +4,6 @@ use franciscoblancojn\wordpress_utils\FWUSystemLog;
 
 $post_id = $CONFIG['post_id'];
 $customFields = [];
-if (isset($post_id)) {
-    $customFields = DPAI_WP_JSON::getCustomFields($post_id);
-}
 if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     $post_id = $_POST['post_id'] ?? $CONFIG['post_id'];
     if (isset($post_id)) {
@@ -53,6 +50,9 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
     ]);
     $DPAI_USE_DATA_CONFIG->set($CONFIG);
 }
+if (isset($post_id)) {
+    $customFields = DPAI_WP_JSON::getCustomFields($post_id);
+}
 
 ?>
 <form method="post">
@@ -66,18 +66,20 @@ if (isset($_POST['save']) && $_POST['save'] == "duplication") {
         <tr>
             <th scope="row">
                 <label for="post_id">
-                    Post id
-                    <?= tooltip('Id de la pagina a duplicar.') ?>
+                    Post
+                    <?= tooltip('Selecciona la página a duplicar.') ?>
                 </label>
             </th>
             <td>
-                <input
-                    type="number"
-                    id="post_id"
-                    name="post_id"
-                    placeholder="Post id"
-                    value="<?= $post_id ?>"
-                    class="regular-text" />
+                <?php
+                wp_dropdown_pages([
+                    'name'              => 'post_id',
+                    'id'                => 'post_id',
+                    'show_option_none'  => '-- Seleccionar --',
+                    'option_none_value' => '',
+                    'selected'          => $post_id,
+                ]);
+                ?>
             </td>
         </tr>
         <?php

@@ -200,7 +200,9 @@ if (isset($_POST['save']) && $_POST['save'] == "duplicates_pendding") {
                                     </label>
                                 </th>
                                 <td>
-                                    <?= $prompt ?>
+                                    <i>
+                                        "<?= $prompt ?>"
+                                    </i>
                                 </td>
                             </tr>
                             <tr>
