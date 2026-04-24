@@ -15,7 +15,40 @@ class DPAI_WP_JSON
             'callback' => [self::class, 'setCustomFieldsEnpoint'],
         ]);
     }
+    private static function extractKeys($data, &$keys)
+{
+    if (is_array($data)) {
+        foreach ($data as $key => $value) {
 
+            // 🔥 también revisar claves (por si acaso)
+            if (is_string($key)) {
+                self::extractKeys($key, $keys);
+            }
+
+            self::extractKeys($value, $keys);
+        }
+
+    } elseif (is_object($data)) {
+
+        foreach ((array)$data as $value) {
+            self::extractKeys($value, $keys);
+        }
+
+    } elseif (is_string($data)) {
+
+        if (preg_match_all('/{{(.*?)}}|__(.*?)__/', $data, $matches)) {
+
+            $foundKeys = array_merge(
+                array_filter($matches[1]),
+                array_filter($matches[2])
+            );
+
+            foreach ($foundKeys as $key) {
+                $keys[] = trim($key);
+            }
+        }
+    }
+}
     public static function getCustomFields($post_id)
     {
         if (!get_post($post_id)) {
@@ -24,16 +57,37 @@ class DPAI_WP_JSON
                 'message' => 'Post no existe'
             ];
         }
-        $result = [];
-        $content = get_post_field('post_content', $post_id);
-        preg_match_all('/{{(.*?)}}/', $content, $matches);
 
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key) {
-                $value = get_post_meta($post_id, $key, true);
-                $result[$key] = $value;
+        $result = [];
+        $keys = [];
+
+        // 🔹 1. Contenido normal (post_content)
+        $content = get_post_field('post_content', $post_id);
+
+        if ($content) {
+            self::extractKeys($content, $keys);
+        }
+
+        // 🔹 2. Elementor (_elementor_data)
+        $elementor_data = get_post_meta($post_id, '_elementor_data', true);
+
+        if ($elementor_data) {
+            $data = json_decode($elementor_data, true);
+
+            if (is_array($data)) {
+                self::extractKeys($data, $keys);
             }
         }
+
+        // 🔥 3. Eliminar duplicados
+        $keys = array_unique($keys);
+
+        // 🔹 4. Obtener valores
+        foreach ($keys as $key) {
+            $value = get_post_meta($post_id, $key, true);
+            $result[$key] = $value;
+        }
+
         return $result;
     }
     public static function getCustomFieldsEnpoint($request)

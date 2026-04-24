@@ -1,25 +1,32 @@
 <?php
+function DPAI_replace_custom_vars($content)
+{
+    preg_match_all('/{{(.*?)}}|__(.*?)__/', $content, $matches);
 
-add_filter('the_content', function ($content) {
-    preg_match_all('/{{(.*?)}}/', $content, $matches);
+    // unir ambos grupos y limpiar
+    $keys = array_filter(array_merge($matches[1], $matches[2]));
 
-    if (!empty($matches[1])) {
-        foreach ($matches[1] as $key) {
-            $value = null;
-            // 1. Si existe GET y estamos en admin
-            if (current_user_can( 'manage_options' ) && isset($_GET[$key]) && $_GET[$key] !== '') {
-                $value = sanitize_text_field($_GET[$key]);
-            }
-            // 2. Si no, usar postmeta
-            else {
-                $value = get_post_meta(get_the_ID(), $key, true);
-            }
-            // 3. Reemplazo
-            if (!empty($value)) {
-                $content = str_replace('{{' . $key . '}}', $value, $content);
-            }
+    foreach ($keys as $key) {
+
+        $value = null;
+
+        if (current_user_can('manage_options') && isset($_GET[$key]) && $_GET[$key] !== '') {
+            $value = sanitize_text_field($_GET[$key]);
+        } else {
+            $value = get_post_meta(get_the_ID(), $key, true);
+        }
+
+        if (!empty($value)) {
+            $content = str_replace(
+                ["{{{$key}}}", "__{$key}__"],
+                $value,
+                $content
+            );
         }
     }
 
     return $content;
-});
+}
+
+add_filter('the_content', 'DPAI_replace_custom_vars');
+// add_filter('elementor/widget/render_content', 'DPAI_replace_custom_vars');
